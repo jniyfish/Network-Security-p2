@@ -29,6 +29,8 @@ def load_data():
                 labels.append(0)
             elif 'A2' in f:
                 labels.append(1)
+            elif 'A5' in f:
+                labels.append(2)
         a=np.array(labels)
     return b,a
 
@@ -37,7 +39,7 @@ def pred_data():
         loaded_model_yaml = yamlfile.read()
     model = model_from_yaml(loaded_model_yaml)
     model.load_weights('./noise.h5')
-    path='./data/A2/'
+    path='./data/A5/'
     i=0
     j=0
     m=0

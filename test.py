@@ -17,13 +17,13 @@ image_size=(480,480)
 
 def  gaussian():
     print("Adding Gaussian noise")
-    noise_path='./Test/T1/'
+    noise_path='./Test/T5/'
     img=io.imread('./my1.png')
     noise_img_gaussian=util.random_noise(img,mode='gaussian')
     io.imsave(noise_path+"gau_1"+".png",noise_img_gaussian)
 def preprocessing():
 
-    input_file = open('./Example_Test/Test_1/packetbeat.json')
+    input_file = open('./Example_Test/Test_5/packetbeat.json')
     i = 0
     q = 0
     k = 0
