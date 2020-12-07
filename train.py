@@ -39,7 +39,7 @@ def pred_data():
         loaded_model_yaml = yamlfile.read()
     model = model_from_yaml(loaded_model_yaml)
     model.load_weights('./noise.h5')
-    path='./data/A5/'
+    path='./data/A2/'
     i=0
     j=0
     m=0

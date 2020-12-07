@@ -11,41 +11,56 @@ from keras.callbacks import ModelCheckpoint
 from skimage import  io, util
 import json
 from PIL import Image
+import sys
+import re
 
 
+argv = './'
 image_size=(480,480)
 
-def  gaussian():
+def gaussian(testcase):
     print("Adding Gaussian noise")
-    noise_path='./Test/T5/'
-    img=io.imread('./my1.png')
+    noise_path='./Test/'
+    img=io.imread('./my86.png')
     noise_img_gaussian=util.random_noise(img,mode='gaussian')
-    io.imsave(noise_path+"gau_1"+".png",noise_img_gaussian)
+    io.imsave( noise_path + testcase+".png",noise_img_gaussian)
 def preprocessing():
-
-    input_file = open('./Example_Test/Test_5/packetbeat.json')
-    i = 0
-    q = 0
-    k = 0
-    w,h = 500 , 500
-    data = np.zeros((h, w, 3), dtype=np.uint8)
-    for in_data in input_file:
-        if i >= 250000:
-            break
-        j = json.loads(in_data)
-        r = j['destination']['port']%128
-        g = j['destination']['port']/128%128
-        b = j['destination']['port']/128/128%128
-        data[q,k] = [r,g,b]
-        k = k+1;
-        if k == 500:
-            q = q+1
-            k = 0
-
-        i =i + 1
-    img = Image.fromarray(data, 'RGB')
-    img.save('./my1.png')
-    img.show()
+    files = os.listdir(sys.argv[1])
+    print(files)
+    fuck = 1 
+    for f in files:
+        dirpath = sys.argv[1] +"/" +f
+        dir = os.listdir(dirpath)
+        for jsonfile in dir:
+            if 'packetbeat.json' in jsonfile:
+                path = sys.argv[1] + "/"+ f + "/" + jsonfile
+                print(path)
+                input_file = open(path)
+                i = 0
+                q = 0
+                k = 0
+                w,h = 500 , 500
+                data = np.zeros((h, w, 3), dtype=np.uint8)
+                for in_data in input_file:
+                    if i >= 250000:
+                        break
+                    j = json.loads(in_data)
+                    try:
+                        r = j['destination']['port']%255
+                        g = j['destination']['port']/255%255
+                        b = j['destination']['port']/128/128%128
+                        data[q,k] = [r,g,b]
+                        k = k+1;
+                        if k == 500:
+                            q = q+1
+                            k = 0
+                        i =i + 1
+                    except KeyError:
+                        continue
+                img = Image.fromarray(data, 'RGB')
+                img.save('./my86.png')
+                #img.show()
+                gaussian(f)
 
 def load_data():
     train_data_path='./Test/'
@@ -57,16 +72,16 @@ def load_data():
     model = model_from_yaml(loaded_model_yaml)
     model.load_weights('./noise.h5')
     for f in files:
-        file_path=train_data_path+f+'/'
-        data=os.listdir(file_path)
-        for fp in data:
-            img=image.load_img(file_path+fp,target_size=image_size, color_mode='grayscale')
-            img_array=image.img_to_array(img)
-            x = np.expand_dims(img_array, axis=0)
-            x /= 255
-            result = model.predict_classes(x,verbose=0)
-            print(f,result)
-
+        img=image.load_img(train_data_path+f,target_size=image_size, color_mode='grayscale')
+        img_array=image.img_to_array(img)
+        x = np.expand_dims(img_array, axis=0)
+        x /= 255
+        result = model.predict_classes(x,verbose=0)
+        t_list  = re.findall(r'\d+', f)
+        if result[0]+1 == 3:
+            print("testcase " +t_list[0] +": attack " ,5)
+        else:
+            print("testcase " +t_list[0] +": attack " ,result[0]+1)
+#print(sys.argv[1])
 preprocessing()
-gaussian()
 load_data()
